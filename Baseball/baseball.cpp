@@ -1,9 +1,10 @@
 #include <string>
 #include <stdexcept>
+#include <iostream>
 using namespace std;
 
-
-struct GuessResult {
+const int MAX_INPUT_NUM = 3;
+ struct GuessResult {
     bool solved;
     int strikes;
     int balls;
@@ -12,17 +13,54 @@ struct GuessResult {
 class Baseball {
 public:
     explicit Baseball(const string& qeustion)
-        : question{ qeustion } {}
+        : CorrectNum{ qeustion } {}
 
-    GuessResult guess(const string& guessNumber){
+    GuessResult guess(const string& guessNumber) {
         assertIllegalArgument(guessNumber);
-        if (guessNumber == question)
-            return { true, 3, 0 };
+        GuessResult result = countGuessScore(guessNumber);
 
-        return { false, 0,0 };
+        return result;
     }
 private:
-    string question;
+    string CorrectNum;
+
+    GuessResult countGuessScore(const std::string& guessNumber)
+    {
+        GuessResult result = { false, 0, 0 };
+
+        result.strikes = countStrike(guessNumber);
+        result.balls = countBall(guessNumber);
+
+        if (result.strikes == 3)
+            result.solved = true;
+
+        return result;
+    }
+
+    int countStrike(const string& guessNumber) {
+        int strikeCount = 0;
+        for (int i = 0; i < MAX_INPUT_NUM; i++)
+        {
+            if (CorrectNum[i] == guessNumber[i])
+                strikeCount++;
+        }
+        return strikeCount;
+    }
+
+    int countBall(const string& guessNumber) {
+        int ballCount = 0;
+        for (int i = 0; i < MAX_INPUT_NUM; i++) {
+            for (int j = 0; j < MAX_INPUT_NUM; j++) {
+                if (i == j) continue;
+
+                if (guessNumber[i] == CorrectNum[j]) {
+                    ballCount++;
+                    break;
+                }
+            }
+        }
+        return ballCount;
+    }
 
     void assertIllegalArgument(const std::string& guessNumber)
     {
